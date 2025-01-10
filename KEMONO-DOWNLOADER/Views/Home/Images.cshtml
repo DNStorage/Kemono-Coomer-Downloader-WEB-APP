@@ -1,0 +1,110 @@
+﻿@model PagesModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    input[type="checkbox"] {
+    transform: scale(5); /* Scale the checkbox to 3x its original size */
+    margin: 50px; /* Add some spacing for better alignment */
+    }
+
+    img,video {
+    width: 300px; /* Set the image width to 50% of its original size */
+    height: auto; /* Maintain the aspect ratio */
+    }
+
+    /* General container styles */
+    .post-container {
+        margin-bottom: 20px; /* Adds consistent spacing between posts */
+        display: flex;
+        flex-direction: column; /* Stacks items vertically */
+        align-items: flex-start; /* Aligns items to the left */
+    }
+
+    /* Content row (checkbox + media) */
+    .content {
+        display: flex;
+        align-items: center; /* Vertically aligns items in the row */
+        gap: 10px; /* Adds spacing between checkbox and media */
+    }
+
+    /* Common media styling for images and videos */
+    .media {
+        max-width: 100%; /* Ensures media fits within the container */
+        height: auto; /* Maintains aspect ratio */
+    }
+
+    .description {
+        margin-bottom: 5px; /* Spacing below description */
+    }
+</style>
+
+<form id="downloadForm" method="post" action="/Home/DownloadImages">
+    @for (int i = 0; i < Model.Posts.Count; i++)
+    {
+        @if (Model.Posts[i].IsImage)
+        {
+            <div class="post-container">
+                <p class="description">
+                    @Model.Posts[i].Name
+                </p>
+                <div class="content">
+                    <input type="checkbox" name="selectedContent" class="form-check-input" value="@Model.Posts[i].Link" />
+                    <img src="@Model.Posts[i].Thumbnail" class="media" />
+                    <a href="@Model.Posts[i].Link">Full quality</a>
+                </div>
+            </div>
+        }
+        else if (Model.Posts[i].IsVideo)
+        {
+            <div class="post-container">
+                <p class="description">
+                    @Model.Posts[i].Name
+                </p>
+                <div class="content">
+                    <input type="checkbox" name="selectedContent" class="form-check-input" value="@Model.Posts[i].Link" />
+                    <video controls preload="none" class="media">
+                        <source src="@Model.Posts[i].Link">
+                    </video>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="post-container">
+                <div class="content">
+                    <input type="checkbox" name="selectedContent" class="form-check-input" value="@Model.Posts[i].Link" />
+                    <p>@Model.Posts[i].Name - <a href="@Model.Posts[i].Link">Link</a></p>
+                </div>
+            </div>
+        }
+    }
+    <button type="submit">Download Selected Images</button>
+</form>
+
+<form method="post" action="/Home/Images">
+    <!-- Previous Button -->
+    @if (Model.CurrentPage > 0)
+    {
+        <button type="submit" name="Page" value="@(Model.CurrentPage - 1)">Previous (@(Model.CurrentPage))</button>
+    }
+
+    <!-- Page Buttons (1 to Pages) -->
+    @for (int pageNum = 0; pageNum < Model.Pages; pageNum++)
+    {
+        <button type="submit" name="Page" value="@pageNum" @(Model.CurrentPage == pageNum ? "disabled" : "")>
+            @(pageNum + 1)
+        </button>
+    }
+
+    <!-- Next Button -->
+    @if (Model.CurrentPage < Model.Pages - 1)
+    {
+        <button type="submit" name="Page" value="@(Model.CurrentPage + 1)">Next (@(Model.CurrentPage + 2))</button>
+    }
+
+    <!-- Hidden Fields for URL -->
+    <input type="hidden" name="Url" value="@Model.Url" />
+    <input type="hidden" name="FilterFuta" value="@Model." />
+</form>
