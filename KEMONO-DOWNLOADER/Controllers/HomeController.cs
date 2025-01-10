@@ -109,14 +109,14 @@ namespace KEMONO_DOWNLOADER.Controllers
                         server = 1;
                 }
             }
-            var x = new PagesModel { Posts = links, CurrentPage = request.Page, Pages = (int)Math.Ceiling(posts.props.count / 50d), Url = request.Url, FilterFuta = request.FilterFuta };
+            var x = new PagesModel { Posts = links, CurrentPage = request.Page, Pages = (int)Math.Ceiling(posts.props.count / 50d), Url = request.Url, FilterFuta = request.FilterFuta, Author = posts.props.artist.name };
             return View(x);
         }
 
         [HttpPost]
-        public async Task<IActionResult> DownloadImages([FromForm] List<string> selectedContent)
+        public async Task<IActionResult> DownloadImages([FromForm] DownloadImagesModel request)
         {
-            if (selectedContent == null || !selectedContent.Any())
+            if (request.SelectedContent == null || !request.SelectedContent.Any())
             {
                 return BadRequest("No images selected.");
             }
@@ -125,7 +125,7 @@ namespace KEMONO_DOWNLOADER.Controllers
 
             using (var zip = ZipFile.Open(tempZipPath, ZipArchiveMode.Update))
             {
-                foreach (var imageUrl in selectedContent)
+                foreach (var imageUrl in request.SelectedContent)
                 {
                     // Download the image data
                     using var client = new HttpClient();
@@ -140,7 +140,7 @@ namespace KEMONO_DOWNLOADER.Controllers
             }
 
             // Return the ZIP file as a downloadable response
-            var zipFileName = "SelectedImages.zip";
+            var zipFileName = $"{request.AuthorName}-{request.Page}.zip";
             return File(System.IO.File.ReadAllBytes(tempZipPath), "application/zip", zipFileName);
         }
     }

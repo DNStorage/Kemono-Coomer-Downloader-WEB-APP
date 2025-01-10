@@ -81,7 +81,9 @@
             </div>
         }
     }
-    <button type="submit" class="btn btn-primary mb-3">Download Selected Images</button>
+    <input type="hidden" name="AuthorName" value="@Model.Author" />
+    <input type="hidden" name="Page" value="@(Model.CurrentPage + 1)" />
+    <button type="submit" class="btn btn-primary mb-3">Download Selected Content</button>
 </form>
 
 <form method="post" action="/Home/Images">
@@ -107,7 +109,8 @@
 
     <!-- Hidden Fields for URL -->
     <input type="hidden" name="Url" value="@Model.Url" />
-    <input type="hidden" name="FilterFuta" value="@Model." />
+    <input type="hidden" name="FilterFuta" value="@Model.FilterFuta" />
+    <input type="hidden" name="Author" value="@Model.Author" />
 </form>
 
 <script>
