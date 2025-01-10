@@ -15,9 +15,13 @@ Here you can see two inputs, a checkbox, that if checked, will try to filter any
 Working example inputs
 
 > https://kemono.su/patreon/user/32764584
+
 > http://kemono.su/patreon/user/32764584
+
 > kemono.su/patreon/user/32764584
+
 > /patreon/user/32764584
+
 > patreon/user/32764584
 
 When you paste a author's kemono page and you click go, you should be seeing something similar to this
