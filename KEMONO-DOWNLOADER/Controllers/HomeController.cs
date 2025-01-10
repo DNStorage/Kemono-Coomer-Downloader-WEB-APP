@@ -96,7 +96,9 @@ namespace KEMONO_DOWNLOADER.Controllers
                 if (post.title.Contains("futa", StringComparison.OrdinalIgnoreCase) && request.FilterFuta) continue;
                 foreach(var attachment in post.attachments)
                 {
-                    if(imageSuffixes.Any(attachment.name.Contains))
+                    if (attachment.name.Contains("futa", StringComparison.OrdinalIgnoreCase) && request.FilterFuta) continue;
+
+                    if (imageSuffixes.Any(attachment.name.Contains))
                         links.Add(new PostWithLink { Thumbnail = $"https://img.kemono.su/thumbnail/data{attachment.path}", Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsImage = true });
                     else if(videoSuffixes.Any(attachment.name.Contains))
                         links.Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsVideo = true });
@@ -112,9 +114,9 @@ namespace KEMONO_DOWNLOADER.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DownloadImages([FromForm] List<string> selectedImages)
+        public async Task<IActionResult> DownloadImages([FromForm] List<string> selectedContent)
         {
-            if (selectedImages == null || !selectedImages.Any())
+            if (selectedContent == null || !selectedContent.Any())
             {
                 return BadRequest("No images selected.");
             }
@@ -123,7 +125,7 @@ namespace KEMONO_DOWNLOADER.Controllers
 
             using (var zip = ZipFile.Open(tempZipPath, ZipArchiveMode.Update))
             {
-                foreach (var imageUrl in selectedImages)
+                foreach (var imageUrl in selectedContent)
                 {
                     // Download the image data
                     using var client = new HttpClient();

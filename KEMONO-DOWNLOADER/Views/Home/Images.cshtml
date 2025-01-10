@@ -40,6 +40,7 @@
     }
 </style>
 
+<button id="toggleButton" class="btn btn-primary mb-3">Toggle all checkboxes</button>
 <form id="downloadForm" method="post" action="/Home/DownloadImages">
     @for (int i = 0; i < Model.Posts.Count; i++)
     {
@@ -87,13 +88,13 @@
     <!-- Previous Button -->
     @if (Model.CurrentPage > 0)
     {
-        <button type="submit" name="Page" value="@(Model.CurrentPage - 1)">Previous (@(Model.CurrentPage))</button>
+        <button type="submit" class="btn btn-primary mb-3" name="Page" value="@(Model.CurrentPage - 1)">Previous (@(Model.CurrentPage))</button>
     }
 
     <!-- Page Buttons (1 to Pages) -->
     @for (int pageNum = 0; pageNum < Model.Pages; pageNum++)
     {
-        <button type="submit" name="Page" value="@pageNum" @(Model.CurrentPage == pageNum ? "disabled" : "")>
+        <button type="submit" class="btn btn-primary mb-3" name="Page" value="@pageNum" @(Model.CurrentPage == pageNum ? "disabled" : "")>
             @(pageNum + 1)
         </button>
     }
@@ -101,10 +102,25 @@
     <!-- Next Button -->
     @if (Model.CurrentPage < Model.Pages - 1)
     {
-        <button type="submit" name="Page" value="@(Model.CurrentPage + 1)">Next (@(Model.CurrentPage + 2))</button>
+        <button type="submit" class="btn btn-primary mb-3" name="Page" value="@(Model.CurrentPage + 1)">Next (@(Model.CurrentPage + 2))</button>
     }
 
     <!-- Hidden Fields for URL -->
     <input type="hidden" name="Url" value="@Model.Url" />
     <input type="hidden" name="FilterFuta" value="@Model." />
 </form>
+
+<script>
+    document.getElementById('toggleButton').addEventListener('click', function () {
+        // Get all checkboxes with the name 'selectedContent'
+        const checkboxes = document.querySelectorAll('input[name="selectedContent"]');
+
+        // Determine the current state of the first checkbox (on or off)
+        const isChecked = checkboxes[0].checked;
+
+        // Toggle the state of all checkboxes based on the first checkbox's state
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !isChecked;
+        });
+    });
+</script>
