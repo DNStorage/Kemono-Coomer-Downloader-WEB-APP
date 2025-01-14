@@ -12,6 +12,7 @@ When you open the website written in the Console app/Terminal you should be gree
 ![Main window](screenshots/MainPage.png)
 
 Here you can see two inputs, a checkbox, that if checked, will try to filter any FUTA related post, but its far from perfect, because it only checks if the string "futa" is present in the name of the post (Case Insensitive). Then you can see a text input, that can either be in a format (http://,https://)kemono.su/*xxx*/user/*xxx* or just the route of the author's page eg. /patreon/user/xxx or patreon/user/xxx. At the backend the application will always try to extract just the route.
+
 Also above the checkbox "Try to filter FUTA content" there will be 2 radio buttons, specifying if you are trying to get artist from Kemono or Coomer. These radio buttons are only relevant when you input only the route of the URL, same as the last two examples below. If the application detect either kemono.su or coomer.su in the URL, it will automatically detect the website you are trying to download from.
 
 Working example inputs
