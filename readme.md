@@ -1,6 +1,6 @@
-## Welcome to KEMONO.SU web based downloader
+## Welcome to KEMONO.SU and COOMER.su web based downloader
 
-The application is written in ASP.NET, and can be ran on any machine with .NET installed. This application allows you to see every attachment on artist's page and then select whatever attachment you want and then download it as a ZIP file. The paging in the application work the same way as the KEMONO.SU one, meaning on the page one in the application you have the same posts as on the page one of artist's site on Kemono.
+The application is written in ASP.NET, and can be ran on any machine with .NET installed. This application allows you to see every attachment on artist's page and then select whatever attachment you want and then download it as a ZIP file. The paging in the application work the same way as the KEMONO.SU one, meaning on the page one in the application you have the same posts as on the page one of artist's site on Kemono/Coomer.
 
 To operate the application you will need .NET 8.0 ([link](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)). On **Windows** all you have to do is run the KEMONO-DOWNLOADER.exe application.
 on **Linux** you need to navigate to the program's folder using a terminal and run the command below
@@ -24,9 +24,9 @@ Working example inputs
 
 > patreon/user/32764584
 
-When you paste a author's kemono page and you click go, you should be seeing something similar to this
+When you paste a author's kemono/coomer page and you click go, you should be seeing something similar to this
 ![Images](screenshots/images.png)
 
-Here you can see the name of the attachment, a check box, which determins, whether or not you want to download said attachment, the attachment itself and if the attachment is an Image, also a link called "Full quality". For speed and performace reasons, this application doesn't fetch full images, but only thumbnails, which are drastically smaller in size and thus speeding up the loading process, but down worry, if you decide to download the image by checking the checkmark, it will download the full resolution version. When you go to the bottom of the page, you can see paging, which corelates to the paging on kemono, meaning that on page 1 there will be all attachments that are present on the author's page on kemono.su. Also there is the button to download all selected attachments at the bottom of the page.
+Here you can see the name of the attachment, a check box, which determins, whether or not you want to download said attachment, the attachment itself and if the attachment is an Image, also a link called "Full quality". For speed and performace reasons, this application doesn't fetch full images, but only thumbnails, which are drastically smaller in size and thus speeding up the loading process, but down worry, if you decide to download the image by checking the checkmark, it will download the full resolution version. When you go to the bottom of the page, you can see paging, which corelates to the paging on kemono/coomer, meaning that on page 1 there will be all attachments that are present on the author's page on kemono.su/coomer.su. Also there is the button to download all selected attachments at the bottom of the page.
 
 If you would like to develop some features yourself, its written in C# .NET 8.0/ASP.NET 8.0
