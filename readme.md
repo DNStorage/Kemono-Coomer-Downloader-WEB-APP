@@ -1,4 +1,4 @@
-## Welcome to KEMONO.SU and COOMER.su web based downloader
+## Welcome to KEMONO.SU and COOMER.SU web based downloader
 
 The application is written in ASP.NET, and can be ran on any machine with .NET installed. This application allows you to see every attachment on artist's page and then select whatever attachment you want and then download it as a ZIP file. The paging in the application work the same way as the KEMONO.SU one, meaning on the page one in the application you have the same posts as on the page one of artist's site on Kemono/Coomer.
 
