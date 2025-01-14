@@ -1,7 +1,9 @@
+using System;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Resources;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using KEMONO_DOWNLOADER.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -89,27 +91,38 @@ namespace KEMONO_DOWNLOADER.Controllers
             var posts = JsonSerializer.Deserialize<PostsModel>(responseString);
 
             List<PostWithLink> links = new List<PostWithLink>();
+            Dictionary<string, List<PostWithLink>> links2 = new Dictionary<string, List<PostWithLink>>();
             int server = 1;
 
             foreach (var post in posts.results)
             {
                 if (post.title.Contains("futa", StringComparison.OrdinalIgnoreCase) && request.FilterFuta) continue;
+                if (!links2.ContainsKey(post.id)) links2.Add(post.id, new List<PostWithLink>());
                 foreach(var attachment in post.attachments)
                 {
                     if (attachment.name.Contains("futa", StringComparison.OrdinalIgnoreCase) && request.FilterFuta) continue;
 
                     if (imageSuffixes.Any(attachment.name.Contains))
+                    {
                         links.Add(new PostWithLink { Thumbnail = $"https://img.kemono.su/thumbnail/data{attachment.path}", Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsImage = true });
-                    else if(videoSuffixes.Any(attachment.name.Contains))
+                        links2[post.id].Add(new PostWithLink { Thumbnail = $"https://img.kemono.su/thumbnail/data{attachment.path}", Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsImage = true });
+                    }
+                    else if (videoSuffixes.Any(attachment.name.Contains))
+                    {
                         links.Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsVideo = true });
+                        links2[post.id].Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsVideo = true });
+                    }
                     else
+                    {
                         links.Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name });
+                        links2[post.id].Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name });
+                    }
 
                     if (++server > 4)
                         server = 1;
                 }
             }
-            var x = new PagesModel { Posts = links, CurrentPage = request.Page, Pages = (int)Math.Ceiling(posts.props.count / 50d), Url = request.Url, FilterFuta = request.FilterFuta, Author = posts.props.artist.name };
+            var x = new PagesModel { Posts = links, CurrentPage = request.Page, Pages = (int)Math.Ceiling(posts.props.count / 50d), Url = request.Url, FilterFuta = request.FilterFuta, Author = posts.props.artist.name, PostsDict = links2, Service = posts.props.service, UserId = posts.props.id };
             return View(x);
         }
 
@@ -142,6 +155,19 @@ namespace KEMONO_DOWNLOADER.Controllers
             // Return the ZIP file as a downloadable response
             var zipFileName = $"{request.AuthorName}-{request.Page}.zip";
             return File(System.IO.File.ReadAllBytes(tempZipPath), "application/zip", zipFileName);
+        }
+
+        [HttpGet("description/{userId}/{platform}/{postId}")]
+        public async Task<ActionResult<string>> GetDescription([FromRoute] int userId, [FromRoute] string platform, [FromRoute] int postId)
+        {
+            var url = $"https://kemono.su/api/v1/{platform}/user/{userId}/post/{postId}";
+
+            HttpClient client = new HttpClient();
+            var response = await client.GetAsync(url);
+            var responseString = await response.Content.ReadAsStringAsync();
+            var post = JsonNode.Parse(responseString);
+
+            return Ok(post?["post"]?["content"]?.ToString()!);
         }
     }
 }

@@ -42,44 +42,54 @@
 
 <button id="toggleButton" class="btn btn-primary mb-3">Toggle all checkboxes</button>
 <form id="downloadForm" method="post" action="/Home/DownloadImages">
-    @for (int i = 0; i < Model.Posts.Count; i++)
+    <hr />
+    @foreach(var post in Model.PostsDict)
     {
-        @if (Model.Posts[i].IsImage)
+        <div class="post-header">
+            <button type="button" class="btn btn-info show-description" data-post-id="@post.Key">Show Description</button>
+            <p class="description" id="description-@post.Key" style="display:none;"></p>
+        </div>
+
+        @for (int i = 0; i < post.Value.Count; i++)
         {
-            <div class="post-container">
-                <p class="description">
-                    @Model.Posts[i].Name
-                </p>
-                <div class="content">
-                    <input type="checkbox" name="selectedContent" class="form-check-input" value="@Model.Posts[i].Link" />
-                    <img src="@Model.Posts[i].Thumbnail" class="media" />
-                    <a href="@Model.Posts[i].Link">Full quality</a>
+            @if (post.Value[i].IsImage)
+            {
+                <div class="post-container">
+                    <p class="description">
+                        @post.Value[i].Name
+                    </p>
+                    <div class="content">
+                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Value[i].Link" />
+                        <img src="@post.Value[i].Thumbnail" class="media" />
+                        <a href="@post.Value[i].Link">Full quality</a>
+                    </div>
                 </div>
-            </div>
-        }
-        else if (Model.Posts[i].IsVideo)
-        {
-            <div class="post-container">
-                <p class="description">
-                    @Model.Posts[i].Name
-                </p>
-                <div class="content">
-                    <input type="checkbox" name="selectedContent" class="form-check-input" value="@Model.Posts[i].Link" />
-                    <video controls preload="none" class="media">
-                        <source src="@Model.Posts[i].Link">
-                    </video>
+            }
+            else if (post.Value[i].IsVideo)
+            {
+                <div class="post-container">
+                    <p class="description">
+                        @post.Value[i].Name
+                    </p>
+                    <div class="content">
+                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Value[i].Link" />
+                        <video controls preload="none" class="media">
+                            <source src="@post.Value[i].Link">
+                        </video>
+                    </div>
                 </div>
-            </div>
-        }
-        else
-        {
-            <div class="post-container">
-                <div class="content">
-                    <input type="checkbox" name="selectedContent" class="form-check-input" value="@Model.Posts[i].Link" />
-                    <p>@Model.Posts[i].Name - <a href="@Model.Posts[i].Link">Link</a></p>
+            }
+            else
+            {
+                <div class="post-container">
+                    <div class="content">
+                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Value[i].Link" />
+                        <p>@post.Value[i].Name - <a href="@post.Value[i].Link">Link</a></p>
+                    </div>
                 </div>
-            </div>
+            }
         }
+        <hr />
     }
     <input type="hidden" name="AuthorName" value="@Model.Author" />
     <input type="hidden" name="Page" value="@(Model.CurrentPage + 1)" />
@@ -124,6 +134,38 @@
         // Toggle the state of all checkboxes based on the first checkbox's state
         checkboxes.forEach(checkbox => {
             checkbox.checked = !isChecked;
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const buttons = document.querySelectorAll('.show-description');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const postId = button.getAttribute('data-post-id');
+                const descriptionElement = document.getElementById(`description-${postId}`);
+
+                if (descriptionElement.style.display === 'none') {
+                    fetch(`/description/@Model.UserId/@Model.Service/${postId}`) // Adjust this to your actual API endpoint
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! Status: ${response.status}`);
+                            }
+                            return response.text();
+                        })
+                        .then(data => {
+
+                            // Update the description element with the content
+                            descriptionElement.innerHTML = data; // Use .innerHTML to render HTML content
+                            descriptionElement.style.display = 'block';
+                            button.textContent = 'Hide Description';
+                        })
+                        .catch(error => console.error('Error fetching description:', error));
+                } else {
+                    descriptionElement.style.display = 'none';
+                    button.textContent = 'Show Description';
+                }
+            });
         });
     });
 </script>
