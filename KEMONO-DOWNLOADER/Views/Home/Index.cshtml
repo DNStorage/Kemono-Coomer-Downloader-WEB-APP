@@ -6,16 +6,18 @@
 <h2>Redirect to Images</h2>
 
 <form id="imagesForm" method="post" action="/Home/Images">
-    <div class="form-check">
         <i>Selection between Coomer and Kemono only matters, if you don't provide the full link but only the route (check github page for further information about links)</i><br />
-        <input type="radio" name="Site" value="Kemono" checked/>
-        <label class="form-check-label" for="flexCheckChecked">
-            Kemono
-        </label>
-        <input type="radio" name="gender" value="Coomer" />
-        <label class="form-check-label" for="flexCheckChecked">
-            Coomer
-        </label>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="Site" id="kemonoRadio" value="Kemono" checked>
+      <label class="form-check-label" for="kemonoRadio">
+        Kemono
+      </label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="Site" id="coomerRadio" value="Coomer">
+      <label class="form-check-label" for="coomerRadio">
+        Coomer
+      </label>
     </div>
     <div class="form-check">
         <input asp-for="FilterFuta" value="true" class="form-check-input" checked />

@@ -99,6 +99,8 @@ namespace KEMONO_DOWNLOADER.Controllers
             List<PagesPostsModel> links = new List<PagesPostsModel>();
             int server = 1;
 
+            if (posts == null || posts.results == null) return NotFound("Artist not found");
+
             foreach (var post in posts.results)
             {
                 if (post.title.Contains("futa", StringComparison.OrdinalIgnoreCase) && request.FilterFuta) continue;
