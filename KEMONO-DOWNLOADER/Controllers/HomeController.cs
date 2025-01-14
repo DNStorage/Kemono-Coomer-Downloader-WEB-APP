@@ -75,7 +75,13 @@ namespace KEMONO_DOWNLOADER.Controllers
 
             if (urlToUse.Contains("kemono.su"))
             {
+                request.Site = DownloaderType.Kemono;
                 urlToUse = urlToUse.Substring(urlToUse.IndexOf("kemono.su") + "kemono.su".Count() + 1);
+            }
+            else if (urlToUse.Contains("coomer.su"))
+            {
+                request.Site = DownloaderType.Coomer;
+                urlToUse = urlToUse.Substring(urlToUse.IndexOf("coomer.su") + "coomer.su".Count() + 1);
             }
             else if (urlToUse[0] == '/')
             {
@@ -83,46 +89,42 @@ namespace KEMONO_DOWNLOADER.Controllers
             }
 
             var pageNumber = request.Page == 0 ? "" : $"?o={request.Page * 50}";
-            var url = $"https://kemono.su/api/v1/{urlToUse}/posts-legacy{pageNumber}";
+            var url = $"https://{request.Site.ToString().ToLower()}.su/api/v1/{urlToUse}/posts-legacy{pageNumber}";
 
             HttpClient client = new HttpClient();
             var response = await client.GetAsync(url);
             var responseString = await response.Content.ReadAsStringAsync();
             var posts = JsonSerializer.Deserialize<PostsModel>(responseString);
 
-            List<PostWithLink> links = new List<PostWithLink>();
-            Dictionary<string, List<PostWithLink>> links2 = new Dictionary<string, List<PostWithLink>>();
+            List<PagesPostsModel> links = new List<PagesPostsModel>();
             int server = 1;
 
             foreach (var post in posts.results)
             {
                 if (post.title.Contains("futa", StringComparison.OrdinalIgnoreCase) && request.FilterFuta) continue;
-                if (!links2.ContainsKey(post.id)) links2.Add(post.id, new List<PostWithLink>());
+                if (!links.Any(x => x.PostId == post.id)) links.Add(new PagesPostsModel { PostId = post.id, PostName = post.title, Posts = new List<PostWithLink>() });
                 foreach(var attachment in post.attachments)
                 {
                     if (attachment.name.Contains("futa", StringComparison.OrdinalIgnoreCase) && request.FilterFuta) continue;
 
                     if (imageSuffixes.Any(attachment.name.Contains))
                     {
-                        links.Add(new PostWithLink { Thumbnail = $"https://img.kemono.su/thumbnail/data{attachment.path}", Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsImage = true });
-                        links2[post.id].Add(new PostWithLink { Thumbnail = $"https://img.kemono.su/thumbnail/data{attachment.path}", Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsImage = true });
+                        links.First(x => x.PostId == post.id).Posts.Add(new PostWithLink { Thumbnail = $"https://img.{request.Site.ToString().ToLower()}.su/thumbnail/data{attachment.path}", Link = $"https://n{server}.{request.Site.ToString().ToLower()}.su/data{attachment.path}", Name = attachment.name, IsImage = true });
                     }
                     else if (videoSuffixes.Any(attachment.name.Contains))
                     {
-                        links.Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsVideo = true });
-                        links2[post.id].Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name, IsVideo = true });
+                        links.First(x => x.PostId == post.id).Posts.Add(new PostWithLink { Link = $"https://n{server}.{request.Site.ToString().ToLower()}.su/data{attachment.path}", Name = attachment.name, IsVideo = true });
                     }
                     else
                     {
-                        links.Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name });
-                        links2[post.id].Add(new PostWithLink { Link = $"https://n{server}.kemono.su/data{attachment.path}", Name = attachment.name });
+                        links.First(x => x.PostId == post.id).Posts.Add(new PostWithLink { Link = $"https://n{server}.{request.Site.ToString().ToLower()}.su/data{attachment.path}", Name = attachment.name });
                     }
 
                     if (++server > 4)
                         server = 1;
                 }
             }
-            var x = new PagesModel { Posts = links, CurrentPage = request.Page, Pages = (int)Math.Ceiling(posts.props.count / 50d), Url = request.Url, FilterFuta = request.FilterFuta, Author = posts.props.artist.name, PostsDict = links2, Service = posts.props.service, UserId = posts.props.id };
+            var x = new PagesModel { CurrentPage = request.Page, Pages = (int)Math.Ceiling(posts.props.count / 50d), Url = request.Url, FilterFuta = request.FilterFuta, Author = posts.props.artist.name, Posts = links, Service = posts.props.service, UserId = posts.props.id, Site = request.Site };
             return View(x);
         }
 
@@ -157,10 +159,10 @@ namespace KEMONO_DOWNLOADER.Controllers
             return File(System.IO.File.ReadAllBytes(tempZipPath), "application/zip", zipFileName);
         }
 
-        [HttpGet("description/{userId}/{platform}/{postId}")]
-        public async Task<ActionResult<string>> GetDescription([FromRoute] int userId, [FromRoute] string platform, [FromRoute] int postId)
+        [HttpGet("description/{site}/{userId}/{platform}/{postId}")]
+        public async Task<ActionResult<string>> GetDescription([FromRoute] DownloaderType site, [FromRoute] string userId, [FromRoute] string platform, [FromRoute] int postId)
         {
-            var url = $"https://kemono.su/api/v1/{platform}/user/{userId}/post/{postId}";
+            var url = $"https://{site.ToString().ToLower()}.su/api/v1/{platform}/user/{userId}/post/{postId}";
 
             HttpClient client = new HttpClient();
             var response = await client.GetAsync(url);

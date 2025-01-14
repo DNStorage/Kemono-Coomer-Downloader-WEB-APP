@@ -43,38 +43,39 @@
 <button id="toggleButton" class="btn btn-primary mb-3">Toggle all checkboxes</button>
 <form id="downloadForm" method="post" action="/Home/DownloadImages">
     <hr />
-    @foreach(var post in Model.PostsDict)
+    @foreach(var post in Model.Posts)
     {
         <div class="post-header">
-            <button type="button" class="btn btn-info show-description" data-post-id="@post.Key">Show Description</button>
-            <p class="description" id="description-@post.Key" style="display:none;"></p>
+            <h2>@post.PostName</h2>
+            <p class="description" id="description-@post.PostId" style="display:none;"></p>
+            <button type="button" class="btn btn-info show-description" data-post-id="@post.PostId">Show Description</button>
         </div>
 
-        @for (int i = 0; i < post.Value.Count; i++)
+        @for (int i = 0; i < post.Posts.Count; i++)
         {
-            @if (post.Value[i].IsImage)
+            @if (post.Posts[i].IsImage)
             {
                 <div class="post-container">
                     <p class="description">
-                        @post.Value[i].Name
+                        @post.Posts[i].Name
                     </p>
                     <div class="content">
-                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Value[i].Link" />
-                        <img src="@post.Value[i].Thumbnail" class="media" />
-                        <a href="@post.Value[i].Link">Full quality</a>
+                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Posts[i].Link" />
+                        <img src="@post.Posts[i].Thumbnail" class="media" />
+                        <a href="@post.Posts[i].Link">Full quality</a>
                     </div>
                 </div>
             }
-            else if (post.Value[i].IsVideo)
+            else if (post.Posts[i].IsVideo)
             {
                 <div class="post-container">
                     <p class="description">
-                        @post.Value[i].Name
+                        @post.Posts[i].Name
                     </p>
                     <div class="content">
-                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Value[i].Link" />
+                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Posts[i].Link" />
                         <video controls preload="none" class="media">
-                            <source src="@post.Value[i].Link">
+                            <source src="@post.Posts[i].Link">
                         </video>
                     </div>
                 </div>
@@ -83,8 +84,8 @@
             {
                 <div class="post-container">
                     <div class="content">
-                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Value[i].Link" />
-                        <p>@post.Value[i].Name - <a href="@post.Value[i].Link">Link</a></p>
+                        <input type="checkbox" name="selectedContent" class="form-check-input" value="@post.Posts[i].Link" />
+                        <p>@post.Posts[i].Name - <a href="@post.Posts[i].Link">Link</a></p>
                     </div>
                 </div>
             }
@@ -121,6 +122,7 @@
     <input type="hidden" name="Url" value="@Model.Url" />
     <input type="hidden" name="FilterFuta" value="@Model.FilterFuta" />
     <input type="hidden" name="Author" value="@Model.Author" />
+    <input type="hidden" name="Site" value="@Model.Site" />
 </form>
 
 <script>
@@ -146,7 +148,7 @@
                 const descriptionElement = document.getElementById(`description-${postId}`);
 
                 if (descriptionElement.style.display === 'none') {
-                    fetch(`/description/@Model.UserId/@Model.Service/${postId}`) // Adjust this to your actual API endpoint
+                    fetch(`/description/@Model.Site.ToString().ToLower()/@Model.UserId/@Model.Service/${postId}`) // Adjust this to your actual API endpoint
                         .then(response => {
                             if (!response.ok) {
                                 throw new Error(`HTTP error! Status: ${response.status}`);
